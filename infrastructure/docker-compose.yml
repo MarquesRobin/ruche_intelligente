@@ -1,0 +1,39 @@
+# ----------------------------------------------
+# title: docker-compose.yml
+# author: Robin Marques
+# date: 2026-01-07
+# updated: 2026-01-07
+# type: configuration
+# status: active
+# tags:
+#   - docker
+#
+# description: Fichier de configuration Docker Compose pour déployer les services nécessaires à la gestion des ruches connectées.
+# ----------------------------------------------
+
+
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto:latest
+    container_name: hive_mqtt_broker
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  database:
+    image: postgres:latest
+    container_name: hive_db
+    environment:
+      POSTGRES_USER: apiculteur
+      POSTGRES_PASSWORD: password_pfe
+      POSTGRES_DB: ruche_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
