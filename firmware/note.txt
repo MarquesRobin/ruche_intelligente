@@ -1,0 +1,1 @@
+Note : /firmware : Codes sources pour les microcontrôleurs ESP32 et STM32 chargés de l'acquisition des données capteurs (poids, température, humidité, acoustique).

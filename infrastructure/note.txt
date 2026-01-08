@@ -1,0 +1,1 @@
+Note : /infrastructure : Fichiers de configuration Docker pour l'orchestration du broker MQTT Mosquitto et de la base de données PostgreSQL.

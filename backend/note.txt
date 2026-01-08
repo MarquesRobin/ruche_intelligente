@@ -1,0 +1,1 @@
+Note : /backend : Serveur de traitement, API REST (FastAPI/Flask) et script de transfert de données MQTT vers PostgreSQL.

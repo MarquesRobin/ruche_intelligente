@@ -1,0 +1,1 @@
+Note : /mobile_app : Application mobile multiplateforme développée avec Flutter.
