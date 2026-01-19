@@ -11,17 +11,18 @@
 # description: Fichier de configuration Docker Compose pour déployer les services nécessaires à la gestion des ruches connectées.
 # ----------------------------------------------
 
-
 services:
   mqtt-broker:
     image: eclipse-mosquitto:latest
     container_name: hive_mqtt_broker
     ports:
       - "1883:1883"
+      - "9001:9001"
     volumes:
-      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    restart: always
 
   database:
     image: postgres:latest
@@ -34,6 +35,19 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    restart: always
+
+  api_backend:
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: hive_api_backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mqtt-broker
+      - database
+    restart: on-failure
 
 volumes:
   postgres_data:

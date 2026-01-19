@@ -1,0 +1,1 @@
+print("Le conteneur Python est opérationnel.")
