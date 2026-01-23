@@ -31,6 +31,7 @@ services:
       POSTGRES_USER: apiculteur
       POSTGRES_PASSWORD: password_pfe
       POSTGRES_DB: ruche_db
+      POSTGRES_HOST: database
     ports:
       - "5432:5432"
     volumes:
