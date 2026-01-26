@@ -12,6 +12,34 @@
 # ----------------------------------------------
 
 services:
+  # ========== Services Docker Compose ==========
+  #
+  # Service de base de données PostgreSQL pour stocker les données des ruches.
+  #
+  # ============================================
+  database:
+    image: postgres:15
+    container_name: hive_db
+    environment:
+      POSTGRES_DB: ruche_db
+      POSTGRES_USER: apiculteur
+      POSTGRES_PASSWORD: password_pfe
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apiculteur -d ruche_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ========= MQTT Broker Service ==========
+  #
+  # Service MQTT Broker utilisant Eclipse Mosquitto. 
+  # Il gère la communication entre les capteurs des ruches et le backend.
+  #
+  # ========================================
   mqtt-broker:
     image: eclipse-mosquitto:latest
     container_name: hive_mqtt_broker
@@ -24,20 +52,11 @@ services:
       - ./mosquitto/log:/mosquitto/log
     restart: always
 
-  database:
-    image: postgres:latest
-    container_name: hive_db
-    environment:
-      POSTGRES_USER: apiculteur
-      POSTGRES_PASSWORD: password_pfe
-      POSTGRES_DB: ruche_db
-      POSTGRES_HOST: database
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql
-    restart: always
-
+  # ========= Backend API Service ==========
+  #
+  # Service backend API développé en Python avec Flask. Il traite les données reçues des capteurs et fournit une API RESTful.
+  #
+  # ========================================
   api_backend:
     build: 
       context: ../backend
@@ -46,8 +65,10 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - mqtt-broker
-      - database
+      mqtt-broker:
+        condition: service_started
+      database:
+          condition: service_healthy
     restart: on-failure
 
 volumes:
