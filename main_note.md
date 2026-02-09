@@ -8,7 +8,7 @@
 - **Le Docker** mets chaque partie dans des conteneurs avec tout le matériel nécessaire pour faire fonctionner le tout. 
 - **Docker Compose** sert de plan de montage pour ces conteneurs.
 
-## Note du 19 janvier : 
+## Note du 21 janvier : 
 
 
 

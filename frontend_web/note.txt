@@ -1,1 +1,0 @@
-Note : /frontend_web : Interface utilisateur pour navigateur basée sur Jinja2 et Flask.

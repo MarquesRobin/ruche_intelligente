@@ -2,12 +2,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Tableau de bord - Ruche Intelligente</title>
+    <title>Dashboard Ruche Intelligente</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
 </head>
 <body>
-    <h1>Données de la Ruche</h1>
-    
-    <table border="1">
+    <h1>Mesures des Ruches en Temps Réel</h1>
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -17,12 +22,14 @@
             </tr>
         </thead>
         <tbody>
+            {% for mesure in mesures %}
             <tr>
-                <td>1</td>
-                <td>2026-01-23 12:00:00</td>
-                <td>24.50</td>
-                <td>41.200</td>
+                <td>{{ mesure[0] }}</td>
+                <td>{{ mesure[1] }}</td>
+                <td>{{ mesure[2] }}</td>
+                <td>{{ mesure[3] }}</td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </body>
