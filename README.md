@@ -12,3 +12,6 @@ Ce dépôt centralise l'ensemble des développements logiciels et micrologiciels
 1. Installer Docker Desktop.
 2. Naviguer dans `/infrastructure`.
 3. Lancer les services : `docker-compose up -d`.
+
+ssh pi-robin@192.168.88.246
+

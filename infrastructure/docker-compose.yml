@@ -20,6 +20,7 @@ services:
   database:
     image: postgres:15
     container_name: hive_db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ruche_db
       POSTGRES_USER: apiculteur
