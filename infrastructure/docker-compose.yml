@@ -2,7 +2,7 @@
 # title: docker-compose.yml
 # author: Robin Marques
 # date: 2026-01-07
-# updated: 2026-01-07
+# updated: 2026-02-17
 # type: configuration
 # status: active
 # tags:
@@ -72,6 +72,30 @@ services:
     restart: on-failure
     environment:
       - PYTHONUNBUFFERED=1
+      - MQTT_BROKER=hive_mqtt_broker
+      - POSTGRES_HOST=hive_db
+
+# ========= LoRa Gateway Service ==========
+  #
+  # Service LoRa Gateway pour la communication avec les capteurs LoRa.
+  #
+  # ========================================
+
+lora_gateway:
+    build: 
+      context: ../backend # Même contexte que api_backend car lora_bridge.py y est stocké
+      dockerfile: Dockerfile_gateway
+    container_name: hive_lora_gateway
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MQTT_BROKER=hive_mqtt_broker
+    depends_on:
+      - mqtt-broker
+    restart: on-failure
+
 
 volumes:
   postgres_data:
+
