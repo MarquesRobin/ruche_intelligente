@@ -13,5 +13,11 @@ Ce dépôt centralise l'ensemble des développements logiciels et micrologiciels
 2. Naviguer dans `/infrastructure`.
 3. Lancer les services : `docker-compose up -d`.
 
-ssh pi-robin@192.168.88.246
+http://192.168.88.246:8080/
 
+ssh pi-robin@192.168.88.246
+rsync -avz --exclude '.git' --exclude '__pycache__' . pi-robin@192.168.88.246:/home/pi-robin/RUCHES_INTELLIGENTES/
+
+AT+MODE=TEST
+AT+TEST=RFCFG,915000000,12,125,8,14,ON,OFF,OFF
+AT+TEST=RXLRPKT

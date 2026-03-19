@@ -82,19 +82,19 @@ services:
   #
   # ========================================
 
-lora_gateway:
-    build: 
-      context: ../backend # Même contexte que api_backend car lora_bridge.py y est stocké
-      dockerfile: Dockerfile_gateway
-    container_name: hive_lora_gateway
-    devices:
-      - "/dev/ttyUSB0:/dev/ttyUSB0"
-    environment:
-      - PYTHONUNBUFFERED=1
-      - MQTT_BROKER=hive_mqtt_broker
-    depends_on:
-      - mqtt-broker
-    restart: on-failure
+  lora_gateway:
+   build: 
+     context: ../backend # Même contexte que api_backend car lora_bridge.py y est stocké
+     dockerfile: Dockerfile_gateway
+   container_name: hive_lora_gateway
+   devices:
+     - "/dev/ttyUSB0:/dev/ttyUSB0"
+   environment:
+     - PYTHONUNBUFFERED=1
+     - MQTT_BROKER=hive_mqtt_broker
+   depends_on:
+     - mqtt-broker
+   restart: on-failure
 
 
 volumes:
