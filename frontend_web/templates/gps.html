@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Localisation GPS{% endblock %}
+
+{% block content %}
+<h1>Localisation GPS — 300 dernières mesures</h1>
+
+<div class="card">
+    <p class="card-title">Historique des positions</p>
+    {% if points %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date et heure</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Carte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for point in points | reverse %}
+            <tr>
+                <td>{{ point.date }}</td>
+                <td>{{ "%.7f" | format(point.lat) }}</td>
+                <td>{{ "%.7f" | format(point.lon) }}</td>
+                <td>
+                    <a class="map-link"
+                       href="https://www.openstreetmap.org/?mlat={{ point.lat }}&mlon={{ point.lon }}&zoom=16"
+                       target="_blank" rel="noopener">
+                        Voir sur la carte
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#95A5A6; padding: 16px 0;">Aucune donnée GPS disponible.</p>
+    {% endif %}
+</div>
+{% endblock %}

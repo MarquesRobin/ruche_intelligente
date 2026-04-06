@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Fréquence acoustique{% endblock %}
+
+{% block content %}
+<h1>Fréquence acoustique — 300 dernières mesures</h1>
+
+<div class="card">
+    <p class="card-title">Fréquence (Hz)</p>
+    <div class="chart-container">
+        <canvas id="chartFreq"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const labels     = {{ labels | safe }};
+    const frequences = {{ frequences | safe }};
+
+    new Chart(document.getElementById('chartFreq'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: frequences,
+                borderColor: '#9B59B6',
+                backgroundColor: 'rgba(155,89,182,0.08)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            spanGaps: true,
+            plugins: { legend: { display: false } },
+            elements: {
+                point: { radius: 0 },
+                line:  { tension: 0.3, borderWidth: 2 }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        maxTicksLimit: 10,
+                        color: '#95A5A6',
+                        font: { size: 11 }
+                    },
+                    grid: { color: '#F0F2F5' }
+                },
+                y: {
+                    ticks: { color: '#95A5A6', font: { size: 11 } },
+                    grid: { color: '#F0F2F5' }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

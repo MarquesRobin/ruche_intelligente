@@ -1,36 +1,103 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Ruche Intelligente</title>
-    <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-    </style>
-</head>
-<body>
-    <h1>Mesures des Ruches en Temps Réel</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date et Heure</th>
-                <th>Température (°C)</th>
-                <th>Poids (kg)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for mesure in mesures %}
-            <tr>
-                <td>{{ mesure[0] }}</td>
-                <td>{{ mesure[1] }}</td>
-                <td>{{ mesure[2] }}</td>
-                <td>{{ mesure[3] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Données principales{% endblock %}
+
+{% block content %}
+<h1>Données principales — 300 dernières mesures</h1>
+
+<div class="card">
+    <p class="card-title">Température (°C)</p>
+    <div class="chart-container">
+        <canvas id="chartTemp"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <p class="card-title">Humidité (%)</p>
+    <div class="chart-container">
+        <canvas id="chartHum"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <p class="card-title">Poids (kg)</p>
+    <div class="chart-container">
+        <canvas id="chartPoids"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const labels       = {{ labels | safe }};
+    const temperatures = {{ temperatures | safe }};
+    const humidites    = {{ humidites | safe }};
+    const poids        = {{ poids | safe }};
+
+    const optionsCommunes = {
+        responsive: true,
+        maintainAspectRatio: false,
+        spanGaps: true,
+        plugins: { legend: { display: false } },
+        elements: {
+            point: { radius: 0 },
+            line:  { tension: 0.3, borderWidth: 2 }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    maxTicksLimit: 10,
+                    color: '#95A5A6',
+                    font: { size: 11 }
+                },
+                grid: { color: '#F0F2F5' }
+            },
+            y: {
+                ticks: { color: '#95A5A6', font: { size: 11 } },
+                grid: { color: '#F0F2F5' }
+            }
+        }
+    };
+
+    new Chart(document.getElementById('chartTemp'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: temperatures,
+                borderColor: '#E74C3C',
+                backgroundColor: 'rgba(231,76,60,0.08)',
+                fill: true
+            }]
+        },
+        options: optionsCommunes
+    });
+
+    new Chart(document.getElementById('chartHum'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: humidites,
+                borderColor: '#3498DB',
+                backgroundColor: 'rgba(52,152,219,0.08)',
+                fill: true
+            }]
+        },
+        options: optionsCommunes
+    });
+
+    new Chart(document.getElementById('chartPoids'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: poids,
+                borderColor: '#27AE60',
+                backgroundColor: 'rgba(39,174,96,0.08)',
+                fill: true
+            }]
+        },
+        options: optionsCommunes
+    });
+</script>
+{% endblock %}
