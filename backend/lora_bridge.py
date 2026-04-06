@@ -1,3 +1,11 @@
+# ========================================
+# Auteur: Robin Marques
+# Langage: Python
+# 
+# Description: Backend pour la passerelle de communication entre les capteurs LoRa et le broker MQTT.
+# Ce script lit les données reçues via le port série, les traite et les publie sur un topic MQTT pour être consommées par le backend principal.
+# =========================================
+
 import serial
 import time
 import json
@@ -28,18 +36,23 @@ def traiter_trame(trame_hex, client_mqtt):
         chaine_ascii = bytes.fromhex(trame_hex).decode('ascii')
         print(f"-> Décodage ASCII réussi : {chaine_ascii}", flush=True)
         donnees = chaine_ascii.split(';')
-        
-        # Validation stricte du vecteur à 2 dimensions (Température;Poids)
-        if len(donnees) == 2:
+
+        # Validation stricte du vecteur à 7 dimensions (Température;Humidité;Fréquence;Poids;SoC;Latitude;Longitude)
+        if len(donnees) == 7:
             payload_json = {
                 "temperature": float(donnees[0]),
-                "poids": float(donnees[1])
+                "humidite":    float(donnees[1]),
+                "frequence":   float(donnees[2]),
+                "poids":       float(donnees[3]),
+                "soc":         float(donnees[4]),
+                "latitude":    float(donnees[5]),
+                "longitude":   float(donnees[6])
             }
             client_mqtt.publish(MQTT_TOPIC, json.dumps(payload_json))
             print(f"-> Publication MQTT réussie : {payload_json}", flush=True)
         else:
-            print(f"-> Rejet analytique : Dimension vectorielle incorrecte ({len(donnees)} au lieu de 2).", flush=True)
-            
+            print(f"-> Rejet analytique : Dimension vectorielle incorrecte ({len(donnees)} au lieu de 7).", flush=True)
+
     except ValueError as erreur_typage:
         print(f"-> Exception de coercition typologique : {erreur_typage}", flush=True)
 

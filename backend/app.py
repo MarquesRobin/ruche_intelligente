@@ -8,11 +8,6 @@
 # gère la connexion au broker MQTT pour recevoir les données des capteurs.
 # =========================================
 
-# ========================================
-# Auteur: Robin Marques
-# Langage: Python 3.11
-# =========================================
-
 import psycopg2
 import os
 import time
@@ -29,17 +24,19 @@ MQTT_BROKER = os.getenv("MQTT_BROKER", "mqtt-broker")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "ruche/mesures")
 
-def insert_measure(temperature, poids):
+def insert_measure(temperature, humidite, frequence, poids, soc, latitude, longitude):
     try:
         conn = psycopg2.connect(dbname=BD_NAME, user=BD_USER, password=BD_PASSWORD, host=BD_HOST)
         with conn.cursor() as cursor:
             cursor.execute(
-                "INSERT INTO mesures_ruche (temperature, poids) VALUES (%s, %s);",
-                (temperature, poids)
+                """INSERT INTO mesures_ruche
+                   (temperature, humidite, frequence, poids, soc, latitude, longitude)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s);""",
+                (temperature, humidite, frequence, poids, soc, latitude, longitude)
             )
             conn.commit()
         conn.close()
-        print(f"Insertion réussie : {temperature}°C | {poids}kg", flush=True)
+        print(f"Insertion réussie : {temperature}°C | {humidite}% | {frequence}Hz | {poids}kg | SoC:{soc}% | ({latitude}, {longitude})", flush=True)
     except Exception as e:
         print(f"Erreur d'insertion SQL : {e}", flush=True)
 
@@ -56,10 +53,17 @@ def on_connect(client, userdata, flags, reason_code, properties):
 def on_message(client, userdata, msg):
     try:
         payload = json.loads(msg.payload.decode())
-        temp = payload.get("temperature")
-        poids = payload.get("poids")
-        if temp is not None and poids is not None:
-            insert_measure(temp, poids)
+        temp      = payload.get("temperature")
+        humidite  = payload.get("humidite")
+        frequence = payload.get("frequence")
+        poids     = payload.get("poids")
+        soc       = payload.get("soc")
+        latitude  = payload.get("latitude")
+        longitude = payload.get("longitude")
+        if None not in (temp, humidite, frequence, poids, soc, latitude, longitude):
+            insert_measure(temp, humidite, frequence, poids, soc, latitude, longitude)
+        else:
+            print(f"Payload incomplet, message ignoré : {payload}", flush=True)
     except Exception as e:
         print(f"Erreur de décodage JSON : {e}", flush=True)
 
@@ -84,12 +88,30 @@ if __name__ == "__main__":
         with conn_init.cursor() as cursor:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS mesures_ruche (
-                    id SERIAL PRIMARY KEY,
-                    date_heure TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    id          SERIAL PRIMARY KEY,
+                    date_heure  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     temperature NUMERIC(5,2),
-                    poids NUMERIC(6,3)
+                    humidite    NUMERIC(5,2),
+                    frequence   NUMERIC(10,2),
+                    poids       NUMERIC(6,3),
+                    soc         NUMERIC(5,2),
+                    latitude    NUMERIC(10,7),
+                    longitude   NUMERIC(10,7)
                 );
             """)
+            # Migration : ajout des nouvelles colonnes si la table existait déjà
+            nouvelles_colonnes = [
+                ("humidite",  "NUMERIC(5,2)"),
+                ("frequence", "NUMERIC(10,2)"),
+                ("soc",       "NUMERIC(5,2)"),
+                ("latitude",  "NUMERIC(10,7)"),
+                ("longitude", "NUMERIC(10,7)"),
+            ]
+            for colonne, type_sql in nouvelles_colonnes:
+                cursor.execute(f"""
+                    ALTER TABLE mesures_ruche
+                    ADD COLUMN IF NOT EXISTS {colonne} {type_sql};
+                """)
             conn_init.commit()
         conn_init.close()
         print("Table 'mesures_ruche' prête.", flush=True)
