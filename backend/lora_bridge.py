@@ -9,6 +9,7 @@
 import serial
 import time
 import json
+import math
 import paho.mqtt.client as mqtt
 import re
 import os
@@ -39,14 +40,18 @@ def traiter_trame(trame_hex, client_mqtt):
 
         # Validation stricte du vecteur à 7 dimensions (Température;Humidité;Fréquence;Poids;SoC;Latitude;Longitude)
         if len(donnees) == 7:
+            def parse(s):
+                val = float(s)
+                return None if math.isnan(val) else val
+
             payload_json = {
-                "temperature": float(donnees[0]),
-                "humidite":    float(donnees[1]),
-                "frequence":   float(donnees[2]),
-                "poids":       float(donnees[3]),
-                "soc":         float(donnees[4]),
-                "latitude":    float(donnees[5]),
-                "longitude":   float(donnees[6])
+                "temperature": parse(donnees[0]),
+                "humidite":    parse(donnees[1]),
+                "frequence":   parse(donnees[2]),
+                "poids":       parse(donnees[3]),
+                "soc":         parse(donnees[4]),
+                "latitude":    parse(donnees[5]),
+                "longitude":   parse(donnees[6])
             }
             client_mqtt.publish(MQTT_TOPIC, json.dumps(payload_json))
             print(f"-> Publication MQTT réussie : {payload_json}", flush=True)

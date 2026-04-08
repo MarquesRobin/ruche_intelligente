@@ -60,10 +60,10 @@ def on_message(client, userdata, msg):
         soc       = payload.get("soc")
         latitude  = payload.get("latitude")
         longitude = payload.get("longitude")
-        if None not in (temp, humidite, frequence, poids, soc, latitude, longitude):
+        if any(v is not None for v in (temp, humidite, frequence, poids, soc, latitude, longitude)):
             insert_measure(temp, humidite, frequence, poids, soc, latitude, longitude)
         else:
-            print(f"Payload incomplet, message ignoré : {payload}", flush=True)
+            print(f"Payload entièrement vide, message ignoré : {payload}", flush=True)
     except Exception as e:
         print(f"Erreur de décodage JSON : {e}", flush=True)
 
