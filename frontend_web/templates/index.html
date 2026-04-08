@@ -24,6 +24,13 @@
         <canvas id="chartPoids"></canvas>
     </div>
 </div>
+
+<div class="card">
+    <p class="card-title">État de charge batterie — SoC (%)</p>
+    <div class="chart-container">
+        <canvas id="chartSoc"></canvas>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -32,6 +39,7 @@
     const temperatures = {{ temperatures | safe }};
     const humidites    = {{ humidites | safe }};
     const poids        = {{ poids | safe }};
+    const soc          = {{ soc | safe }};
 
     const optionsCommunes = {
         responsive: true,
@@ -94,6 +102,20 @@
                 data: poids,
                 borderColor: '#27AE60',
                 backgroundColor: 'rgba(39,174,96,0.08)',
+                fill: true
+            }]
+        },
+        options: optionsCommunes
+    });
+
+    new Chart(document.getElementById('chartSoc'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: soc,
+                borderColor: '#E67E22',
+                backgroundColor: 'rgba(230,126,34,0.08)',
                 fill: true
             }]
         },

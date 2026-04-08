@@ -50,12 +50,14 @@ def home():
         temperatures = [to_float(m[2]) for m in mesures]
         humidites    = [to_float(m[3]) for m in mesures]
         poids        = [to_float(m[5]) for m in mesures]
+        soc          = [to_float(m[6]) for m in mesures]
         return render_template('index.html',
             active_page='home',
             labels=json.dumps(labels),
             temperatures=json.dumps(temperatures),
             humidites=json.dumps(humidites),
-            poids=json.dumps(poids)
+            poids=json.dumps(poids),
+            soc=json.dumps(soc)
         )
     except Exception as e:
         return f"Erreur de connexion à la base de données : {e}"
