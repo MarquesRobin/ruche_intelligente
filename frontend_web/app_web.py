@@ -11,6 +11,7 @@ import psycopg2
 from flask import Flask, render_template
 import os
 import json
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 
@@ -39,17 +40,23 @@ def get_mesures():
     conn.close()
     return rows
 
+UTC      = ZoneInfo('UTC')
+QUEBEC   = ZoneInfo('America/Toronto')
+
 def to_float(val):
     return float(val) if val is not None else None
+
+def fmt_date(dt):
+    return dt.replace(tzinfo=UTC).astimezone(QUEBEC).strftime('%d/%m %H:%M:%S')
 
 @app.route('/')
 def home():
     try:
         mesures = get_mesures()
-        labels       = [m[1].strftime('%d/%m %H:%M') for m in mesures]
+        labels       = [fmt_date(m[1]) for m in mesures]
         temperatures = [to_float(m[2]) for m in mesures]
         humidites    = [to_float(m[3]) for m in mesures]
-        poids        = [to_float(m[5]) for m in mesures]
+        poids        = [round(to_float(m[5]) * 1000, 1) if to_float(m[5]) is not None else None for m in mesures]
         soc          = [to_float(m[6]) for m in mesures]
         return render_template('index.html',
             active_page='home',
@@ -66,7 +73,7 @@ def home():
 def frequence():
     try:
         mesures = get_mesures()
-        labels     = [m[1].strftime('%d/%m %H:%M') for m in mesures]
+        labels     = [fmt_date(m[1]) for m in mesures]
         frequences = [to_float(m[4]) for m in mesures]
         return render_template('frequence.html',
             active_page='frequence',
@@ -82,7 +89,7 @@ def gps():
         mesures = get_mesures()
         points = [
             {
-                'date': m[1].strftime('%Y-%m-%d %H:%M:%S'),
+                'date': fmt_date(m[1]),
                 'lat': to_float(m[7]),
                 'lon': to_float(m[8]),
             }
